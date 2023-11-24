@@ -18,6 +18,17 @@ using namespace std;
 #include <srs_core_autofree.hpp>
 #include <srs_protocol_http_conn.hpp>
 
+void KeyLogCallback(const SSL *ssl, const char *line) {
+    const char *log_file_path = std::getenv("SSLKEYLOGFILE");
+    if (log_file_path != nullptr) {
+        FILE *log_file = fopen(log_file_path, "a");
+        if (log_file != nullptr) {
+            fprintf(log_file, "%s\n", line);
+            fclose(log_file);
+        }
+    }
+}
+
 // The return value of verify_callback controls the strategy of the further verification process. If verify_callback
 // returns 0, the verification process is immediately stopped with "verification failed" state. If SSL_VERIFY_PEER is
 // set, a verification failure alert is sent to the peer and the TLS/SSL handshake is terminated. If verify_callback

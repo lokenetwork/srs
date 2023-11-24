@@ -29,6 +29,8 @@ using namespace std;
 // @see https://github.com/ossrs/srs/issues/2415
 const int DTLS_FRAGMENT_MAX_SIZE = 1200;
 
+extern void KeyLogCallback(const SSL *ssl, const char *line);
+
 // Defined in HTTP/HTTPS client.
 extern int srs_verify_callback(int preverify_ok, X509_STORE_CTX *ctx);
 
@@ -161,6 +163,8 @@ SSL_CTX* srs_build_dtls_ctx(SrsDtlsVersion version, std::string role)
         // Setup the certificate.
         srs_assert(SSL_CTX_use_certificate(dtls_ctx, _srs_rtc_dtls_certificate->get_cert()) == 1);
         srs_assert(SSL_CTX_use_PrivateKey(dtls_ctx, _srs_rtc_dtls_certificate->get_public_key()) == 1);
+
+        SSL_CTX_set_keylog_callback(dtls_ctx, KeyLogCallback);
 
         // Server will send Certificate Request.
         // @see https://www.openssl.org/docs/man1.0.2/man3/SSL_CTX_set_verify.html
