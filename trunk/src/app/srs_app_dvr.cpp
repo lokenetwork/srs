@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2013-2023 The SRS Authors
 //
-// SPDX-License-Identifier: MIT or MulanPSL-2.0
+// SPDX-License-Identifier: MIT
 //
 
 #include <srs_app_dvr.hpp>
@@ -868,7 +868,6 @@ srs_error_t SrsDvrSegmentPlan::update_duration(SrsSharedPtrMessage* msg)
     }
     
     // when wait keyframe, ignore if no frame arrived.
-    // @see https://github.com/ossrs/srs/issues/177
     if (wait_keyframe) {
         if (!msg->is_video()) {
             return err;

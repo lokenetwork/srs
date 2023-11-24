@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2013-2023 The SRS Authors
 //
-// SPDX-License-Identifier: MIT or MulanPSL-2.0
+// SPDX-License-Identifier: MIT
 //
 
 #include <srs_app_threads.hpp>
@@ -49,7 +49,7 @@ using namespace std;
 
 // These functions first appeared in glibc in version 2.12.
 // See https://man7.org/linux/man-pages/man3/pthread_setname_np.3.html
-#if defined(SRS_CYGWIN64) || (defined(SRS_CROSSBUILD) && ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 12)))
+#if defined(SRS_CYGWIN64) || (defined(SRS_CROSSBUILD) && defined(__GLIBC__) && ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 12)))
     void pthread_setname_np(pthread_t trd, const char* name) {
     }
 #endif
@@ -295,6 +295,10 @@ srs_error_t SrsCircuitBreaker::on_timer(srs_utime_t interval)
 SrsCircuitBreaker* _srs_circuit_breaker = NULL;
 SrsAsyncCallWorker* _srs_dvr_async = NULL;
 
+extern srs_error_t _srs_reload_err;
+extern SrsReloadState _srs_reload_state;
+extern std::string _srs_reload_id;
+
 srs_error_t srs_global_initialize()
 {
     srs_error_t err = srs_success;
@@ -445,6 +449,10 @@ srs_error_t srs_global_initialize()
     _srs_cls = new SrsClsClient();
     _srs_apm = new SrsApmClient();
 #endif
+
+    _srs_reload_err = srs_success;
+    _srs_reload_state = SrsReloadStateInit;
+    _srs_reload_id = srs_random_str(7);
 
     return err;
 }
